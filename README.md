@@ -8,6 +8,7 @@ cmsrel CMSSW_12_3_0_pre4
 cd CMSSW_12_3_0_pre4/src
 cmsenv
 git cms-init
+git cms-addpkg L1Trigger/L1TMuonEndCap
 git clone git@github.com:jlidrych/EMTFTools.git
 scram b -j 10
 ```
