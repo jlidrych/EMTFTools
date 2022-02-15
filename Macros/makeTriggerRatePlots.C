@@ -141,7 +141,7 @@ int makeTriggerRatePlots(){
 
 
   bool doSingleMuon = true;
-  bool doDimuon     = false;
+  bool doDimuon     = true;
 
   if (doSingleMuon){
     // Single muon rates 
