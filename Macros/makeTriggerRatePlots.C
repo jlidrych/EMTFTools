@@ -45,8 +45,8 @@ int DefaultColor(int j,int i){
 int makeTriggerRatePlots(){
 
   //read data
-  TString ntuple = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/RelValMinBias_14TeV/MC-MB/220214_123148/0000/EMTFNtuple_*.root";
-
+  TString ntuple = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/RelValMinBias_14TeV/MC-MB/220215_195151/0000/EMTFNtuple_*.root";
+  //  TString ntuple = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/RelValNuGun/MC-NuGun/220215_133739/0000/EMTFNtuple_*.root";
   TChain * cc=new TChain("EMTFNtuple/tree");
   cc->Add(ntuple);
   
@@ -97,40 +97,10 @@ int makeTriggerRatePlots(){
 
   // initialize cuts
 
-  TH1F *h_pT_noDxy = new TH1F("h_pT_noDxy", "", 300, 0.5, 300.5);
-  TH1F *h_pT_25Dxy = new TH1F("h_pT_25Dxy", "", 300, 0.5, 300.5);
-  TH1F *h_pT_50Dxy = new TH1F("h_pT_50Dxy", "", 300, 0.5, 300.5);
-  TH1F *h_pT_75Dxy = new TH1F("h_pT_75Dxy", "", 300, 0.5, 300.5);
-
-  TH1F *h_pT_noDxyEta1 = new TH1F("h_pT_noDxyEta1", "NNv6", 300, 0.5, 300.5);
-  TH1F *h_pT_25DxyEta1 = new TH1F("h_pT_25DxyEta1", "", 300, 0.5, 300.5);
-  TH1F *h_pT_50DxyEta1 = new TH1F("h_pT_50DxyEta1", "", 300, 0.5, 300.5);
-  TH1F *h_pT_75DxyEta1 = new TH1F("h_pT_75DxyEta1", "", 300, 0.5, 300.5);
-
-  TH1F *h_pT_noDxyEta2 = new TH1F("h_pT_noDxyEta2", "NNv6", 300, 0.5, 300.5);
-  TH1F *h_pT_25DxyEta2 = new TH1F("h_pT_25DxyEta2", "", 300, 0.5, 300.5);
-  TH1F *h_pT_50DxyEta2 = new TH1F("h_pT_50DxyEta2", "", 300, 0.5, 300.5);
-  TH1F *h_pT_75DxyEta2 = new TH1F("h_pT_75DxyEta2", "", 300, 0.5, 300.5);
-
-  TH1F *h_pT_noDxyEta3 = new TH1F("h_pT_noDxyEta3", "NNv6", 300, 0.5, 300.5);
-  TH1F *h_pT_25DxyEta3 = new TH1F("h_pT_25DxyEta3", "", 300, 0.5, 300.5);
-  TH1F *h_pT_50DxyEta3 = new TH1F("h_pT_50DxyEta3", "", 300, 0.5, 300.5);
-  TH1F *h_pT_75DxyEta3 = new TH1F("h_pT_75DxyEta3", "", 300, 0.5, 300.5);
-
-  TH1F *h_pT_noDxyDimu = new TH1F("h_pT_noDxyDimu", "NNv6", 30, 0.5, 30.5);
-  TH1F *h_pT_25DxyDimu = new TH1F("h_pT_25DxyDimu", "", 30, 0.5, 30.5);
-  TH1F *h_pT_50DxyDimu = new TH1F("h_pT_50DxyDimu", "", 30, 0.5, 30.5);
-  TH1F *h_pT_75DxyDimu = new TH1F("h_pT_75DxyDimu", "", 30, 0.5, 30.5);
-
-  TH1F *h_pT_noDxyDimu10 = new TH1F("h_pT_noDxyDimu10", "NNv6", 30, 0.5, 30.5);
-  TH1F *h_pT_25DxyDimu10 = new TH1F("h_pT_25DxyDimu10", "", 30, 0.5, 30.5);
-  TH1F *h_pT_50DxyDimu10 = new TH1F("h_pT_50DxyDimu10", "", 30, 0.5, 30.5);
-  TH1F *h_pT_75DxyDimu10 = new TH1F("h_pT_75DxyDimu10", "", 30, 0.5, 30.5);
-
-  TH1F *h_pT_noDxyDimu20 = new TH1F("h_pT_noDxyDimu20", "NNv6", 30, 0.5, 30.5);
-  TH1F *h_pT_25DxyDimu20 = new TH1F("h_pT_25DxyDimu20", "", 30, 0.5, 30.5);
-  TH1F *h_pT_50DxyDimu20 = new TH1F("h_pT_50DxyDimu20", "", 30, 0.5, 30.5);
-  TH1F *h_pT_75DxyDimu20 = new TH1F("h_pT_75DxyDimu20", "", 30, 0.5, 30.5);
+  TH1F *h_pT = new TH1F("h_pT", "", 300, 0.5, 300.5);
+  TH1F *h_pT_Eta1 = new TH1F("h_pT_Eta1", "", 300, 0.5, 300.5);
+  TH1F *h_pT_Eta2 = new TH1F("h_pT_Eta2", "", 300, 0.5, 300.5);
+  TH1F *h_pT_Eta3 = new TH1F("h_pT_Eta3", "", 300, 0.5, 300.5);
 
 
   int eventCount = 0;
@@ -141,7 +111,6 @@ int makeTriggerRatePlots(){
 
 
   bool doSingleMuon = true;
-  bool doDimuon     = true;
 
   if (doSingleMuon){
     // Single muon rates 
@@ -149,306 +118,80 @@ int makeTriggerRatePlots(){
       eventCount++;
       if (eventCount % 1000 == 0) std::cout << eventCount << " events read!" << std::endl;
       for (int ptThreshold = 0; ptThreshold < 300; ptThreshold++){
+
 	for (int i=0; i<*gmtMuonSize; i++){
 	  bool passedMuon = false;
-	  if(abs(gmtMuonEta[i]) < 1.24 or abs(gmtMuonEta[i]) > 2.5) continue;
-	  float dR_EMTF = 99.0;
-	  int idx_EMTF = -99;
-	  // GMT muon EMTF track matching
-	  for (int j=0; j<*emtfTrackSize; j++){
-	    if(emtfTrackBX[j] != 0) continue;
-	    
-	    float GMTEta = emtfTrackGMTEta[j] * 0.010875;
-	    int globPhi = (emtfTrackSector[j] - 1) * 96 + emtfTrackGMTPhi[j];
-	    globPhi = (globPhi + 600) % 576;
-	    float GMTPhi = globPhi * 0.010908;
-	    float dR_new_EMTF = TMath::Sqrt((gmtMuonEta[i]-GMTEta)*(gmtMuonEta[i]-GMTEta)+DPhi(gmtMuonPhi[i],GMTPhi)*DPhi(gmtMuonPhi[i],GMTPhi));
-	    if(dR_new_EMTF < dR_EMTF){
-	      idx_EMTF = j;
-	      dR_EMTF = dR_new_EMTF;
-	    }	  
-	  }
 
-	  if (idx_EMTF < 0) continue;
-	  if (emtfTrackMode[idx_EMTF] < 11) continue;
+	  if(abs(gmtMuonEta[i]) < 1.24 || abs(gmtMuonEta[i]) > 2.5) continue;
+       	  if(gmtMuonQual[i] <= 11) continue;
 
-	  if(ptThreshold < emtfTrackPt[idx_EMTF]){	  
-	    h_pT_noDxy->Fill(ptThreshold,rate);
+	  if( gmtMuonPt[i] > ptThreshold){
+       	    passedMuon = true;
+	    h_pT->Fill(ptThreshold,rate);
 	    if (abs(gmtMuonEta[i]) > 2.1){
-	      h_pT_noDxyEta3->Fill(ptThreshold,rate);
+	      h_pT_Eta3->Fill(ptThreshold,rate);
 	    }
 	    else if (abs(gmtMuonEta[i]) > 1.6){
-	      h_pT_noDxyEta2->Fill(ptThreshold,rate);
+	      h_pT_Eta2->Fill(ptThreshold,rate);
 	    }
 	    else if (abs(gmtMuonEta[i]) > 1.2){
-	      h_pT_noDxyEta1->Fill(ptThreshold,rate);
+	      h_pT_Eta1->Fill(ptThreshold,rate);
 	    }
 	  }
+	  if (passedMuon) break;
 	}// GMT loop
       }// ptThreshold loop
     }// event loop
   }
 
-
-
-  if(doDimuon){
-    // Dimuon rates 
-    while(reader.Next()){
-      eventCount++;
-      if (eventCount % 10000 == 0) std::cout << eventCount << " events read!" << std::endl;
-      for (int ptThreshold = 0; ptThreshold < 21; ptThreshold++){
-        int passedMuonCount = 0;
-        bool passed20 = false;
-        bool passed10 = false;
-        int mu1 = -1;
-        int mu2 = -1;
-        int mu10 = -1;
-        int mu20 = -1;
-
-        for (int i=0; i<*gmtMuonSize; i++){
-          if(abs(gmtMuonEta[i]) < 1.24 or abs(gmtMuonEta[i]) > 2.5) continue;
-
-          float dR_EMTF = 99.0;
-          int idx_EMTF = -99;
-          // GMT muon EMTF track matching
-          for (int j=0; j<*emtfTrackSize; j++){
-            if(emtfTrackBX[j] != 0) continue;
-
-            float GMTEta = emtfTrackGMTEta[j] * 0.010875;
-
-            int globPhi = (emtfTrackSector[j] - 1) * 96 + emtfTrackGMTPhi[j];
-
-            globPhi = (globPhi + 600) % 576;
-
-            float GMTPhi = globPhi * 0.010908;
-
-            float dR_new_EMTF = TMath::Sqrt((gmtMuonEta[i]-GMTEta)*(gmtMuonEta[i]-GMTEta)+DPhi(gmtMuonPhi[i],GMTPhi)*DPhi(gmtMuonPhi[i],GMTPhi));
-            // std::cout << "dR EMTF: " << dR_new_EMTF << std::endl;
-
-            if(dR_new_EMTF > dR_EMTF){
-              continue;
-            }
-            else{
-              idx_EMTF = j;
-              dR_EMTF = dR_new_EMTF;
-
-            }
-
-
-          }
-          if (idx_EMTF < 0) continue;
-          if (emtfTrackPtDxy[idx_EMTF] > 20){
-            mu20 = idx_EMTF;
-          }
-          if (emtfTrackPtDxy[idx_EMTF] > 10){
-            mu10 = idx_EMTF;
-          }
-
-          if (emtfTrackPtDxy[idx_EMTF] > ptThreshold){
-            passedMuonCount++;
-            if (passedMuonCount == 1) mu1 = idx_EMTF;
-            if (passedMuonCount == 2) mu2 = idx_EMTF;
-          }
-
-          bool filled = false;
-          if (passedMuonCount > 1 && !filled){
-            filled = true;
-            h_pT_noDxyDimu->Fill(ptThreshold,rate);
-            
-            if     ( abs(emtfTrackDxy[mu1]) > 75 && abs(emtfTrackDxy[mu2]) > 75) h_pT_75DxyDimu->Fill(ptThreshold,rate);
-            else if( abs(emtfTrackDxy[mu1]) > 50 && abs(emtfTrackDxy[mu2]) > 50) h_pT_50DxyDimu->Fill(ptThreshold,rate);
-            else if( abs(emtfTrackDxy[mu1]) > 25 && abs(emtfTrackDxy[mu2]) > 25) h_pT_25DxyDimu->Fill(ptThreshold,rate);
-
-          }
-
-          bool filled10 = false;
-          if (passedMuonCount > 1 && mu10 > -1 && !filled10 && ptThreshold <= 10){
-            filled10 = true;
-            h_pT_noDxyDimu10->Fill(ptThreshold,rate);
-
-            int muOther = -1;
-
-            if (mu1 == mu10) muOther = mu2;
-            else muOther = mu1;
-
-            
-            if     ( abs(emtfTrackDxy[mu10]) > 75 && abs(emtfTrackDxy[muOther]) > 75) h_pT_75DxyDimu10->Fill(ptThreshold,rate);
-            else if( abs(emtfTrackDxy[mu10]) > 50 && abs(emtfTrackDxy[muOther]) > 50) h_pT_50DxyDimu10->Fill(ptThreshold,rate);
-            else if( abs(emtfTrackDxy[mu10]) > 25 && abs(emtfTrackDxy[muOther]) > 25) h_pT_25DxyDimu10->Fill(ptThreshold,rate);
-
-          }
-
-          bool filled20 = false;
-          if (passedMuonCount > 1 && mu20 > -1 && !filled20 && ptThreshold <= 20){
-            filled20 = true;
-            h_pT_noDxyDimu20->Fill(ptThreshold,rate);
-
-            int muOther = -1;
-
-            if (mu1 == mu20) muOther = mu2;
-            else muOther = mu1;
-
-            
-            if     ( abs(emtfTrackDxy[mu20]) > 75 && abs(emtfTrackDxy[muOther]) > 75) h_pT_75DxyDimu20->Fill(ptThreshold,rate);
-            else if( abs(emtfTrackDxy[mu20]) > 50 && abs(emtfTrackDxy[muOther]) > 50) h_pT_50DxyDimu20->Fill(ptThreshold,rate);
-            else if( abs(emtfTrackDxy[mu20]) > 25 && abs(emtfTrackDxy[muOther]) > 25) h_pT_25DxyDimu20->Fill(ptThreshold,rate);
-
-          }
-          
-            
-        } // GMT loop
-      } // pTThreshold loop
-    } // event loop
-  }
-
-
   // canvasname.push_back("out_ptUnc_vs_dxy_wME11a"); 
   TString titlePt="L1 pT threshold [GeV]";
-  TString titleDxy="Gen Muon D_{0} [cm]";
-  TString titleLxy="Gen Muon Lxy [cm]";
-  TString titleEta="Gen Muon #eta";
-  TString titlePhi="Gen Muon #phi";
+
+  h_pT->GetXaxis()->SetTitle(titlePt);
+  h_pT->GetYaxis()->SetTitle("Rate [kHz]");
+  h_pT->GetXaxis()->SetRangeUser(0.4,300);
+  h_pT->GetYaxis()->SetRangeUser(0.01,10000);
+  h_pT->GetYaxis()->SetTitleOffset(1.3);
+  h_pT->GetXaxis()->SetTitleOffset(1.3);
+
+  h_pT_Eta1->GetXaxis()->SetTitle(titlePt);
+  h_pT_Eta1->GetYaxis()->SetTitle("Rate [kHz]");
+  h_pT_Eta1->GetXaxis()->SetRangeUser(0.4,300);
+  h_pT_Eta1->GetYaxis()->SetRangeUser(0.1,10000);
+  h_pT_Eta1->GetYaxis()->SetTitleOffset(1.3);
+  h_pT_Eta1->GetXaxis()->SetTitleOffset(1.3);
+
+  h_pT_Eta2->GetXaxis()->SetTitle(titlePt);
+  h_pT_Eta2->GetYaxis()->SetTitle("Rate [kHz]");
+  h_pT_Eta2->GetXaxis()->SetRangeUser(0.4,300);
+  h_pT_Eta2->GetYaxis()->SetRangeUser(0.1,10000);
+  h_pT_Eta2->GetYaxis()->SetTitleOffset(1.3);
+  h_pT_Eta2->GetXaxis()->SetTitleOffset(1.3);
+
+  h_pT_Eta3->GetXaxis()->SetTitle(titlePt);
+  h_pT_Eta3->GetYaxis()->SetTitle("Rate [kHz]");
+  h_pT_Eta3->GetXaxis()->SetRangeUser(0.4,300);
+  h_pT_Eta3->GetYaxis()->SetRangeUser(0.1,10000);
+  h_pT_Eta3->GetYaxis()->SetTitleOffset(1.3);
+  h_pT_Eta3->GetXaxis()->SetTitleOffset(1.3);
 
 
+  h_pT->SetLineWidth(3);
+  h_pT->SetLineColor(1);
 
-  h_pT_noDxy->GetXaxis()->SetTitle(titlePt);
-  h_pT_noDxy->GetYaxis()->SetTitle("Rate [kHz]");
-  h_pT_noDxy->GetXaxis()->SetRangeUser(0.4,300);
-  h_pT_noDxy->GetYaxis()->SetRangeUser(0.01,10000);
-  h_pT_noDxy->GetYaxis()->SetTitleOffset(1.3);
-  h_pT_noDxy->GetXaxis()->SetTitleOffset(1.3);
+  h_pT_Eta1->SetLineWidth(3);
+  h_pT_Eta1->SetLineColor(1);
 
-  h_pT_noDxyEta1->GetXaxis()->SetTitle(titlePt);
-  h_pT_noDxyEta1->GetYaxis()->SetTitle("Rate [kHz]");
-  h_pT_noDxyEta1->GetXaxis()->SetRangeUser(0.4,300);
-  h_pT_noDxyEta1->GetYaxis()->SetRangeUser(0.1,10000);
-  h_pT_noDxyEta1->GetYaxis()->SetTitleOffset(1.3);
-  h_pT_noDxyEta1->GetXaxis()->SetTitleOffset(1.3);
+  h_pT_Eta2->SetLineWidth(3);
+  h_pT_Eta2->SetLineColor(1);
 
-  h_pT_noDxyEta2->GetXaxis()->SetTitle(titlePt);
-  h_pT_noDxyEta2->GetYaxis()->SetTitle("Rate [kHz]");
-  h_pT_noDxyEta2->GetXaxis()->SetRangeUser(0.4,300);
-  h_pT_noDxyEta2->GetYaxis()->SetRangeUser(0.1,10000);
-  h_pT_noDxyEta2->GetYaxis()->SetTitleOffset(1.3);
-  h_pT_noDxyEta2->GetXaxis()->SetTitleOffset(1.3);
-
-  h_pT_noDxyEta3->GetXaxis()->SetTitle(titlePt);
-  h_pT_noDxyEta3->GetYaxis()->SetTitle("Rate [kHz]");
-  h_pT_noDxyEta3->GetXaxis()->SetRangeUser(0.4,300);
-  h_pT_noDxyEta3->GetYaxis()->SetRangeUser(0.1,10000);
-  h_pT_noDxyEta3->GetYaxis()->SetTitleOffset(1.3);
-  h_pT_noDxyEta3->GetXaxis()->SetTitleOffset(1.3);
-
-  h_pT_noDxyDimu->GetXaxis()->SetTitle(titlePt);
-  h_pT_noDxyDimu->GetYaxis()->SetTitle("Rate [kHz]");
-  h_pT_noDxyDimu->GetXaxis()->SetRangeUser(0.4,300);
-  h_pT_noDxyDimu->GetYaxis()->SetRangeUser(0.001,1000);
-  h_pT_noDxyDimu->GetYaxis()->SetTitleOffset(1.3);
-  h_pT_noDxyDimu->GetXaxis()->SetTitleOffset(1.3);
-
-  h_pT_noDxyDimu10->GetXaxis()->SetTitle(titlePt);
-  h_pT_noDxyDimu10->GetYaxis()->SetTitle("Rate [kHz]");
-  h_pT_noDxyDimu10->GetXaxis()->SetRangeUser(0.4,300);
-  h_pT_noDxyDimu10->GetYaxis()->SetRangeUser(0.001,1000);
-  h_pT_noDxyDimu10->GetYaxis()->SetTitleOffset(1.3);
-  h_pT_noDxyDimu10->GetXaxis()->SetTitleOffset(1.3);
-
-  h_pT_noDxyDimu20->GetXaxis()->SetTitle(titlePt);
-  h_pT_noDxyDimu20->GetYaxis()->SetTitle("Rate [kHz]");
-  h_pT_noDxyDimu20->GetXaxis()->SetRangeUser(0.4,300);
-  h_pT_noDxyDimu20->GetYaxis()->SetRangeUser(0.001,1000);
-  h_pT_noDxyDimu20->GetYaxis()->SetTitleOffset(1.3);
-  h_pT_noDxyDimu20->GetXaxis()->SetTitleOffset(1.3);
-
-  h_pT_noDxy->SetLineWidth(3);
-  h_pT_noDxy->SetLineColor(1);
-
-  h_pT_25Dxy->SetLineWidth(3);
-  h_pT_25Dxy->SetLineColor(2);
-
-  h_pT_50Dxy->SetLineWidth(3);
-  h_pT_50Dxy->SetLineColor(4);
-
-  h_pT_75Dxy->SetLineWidth(3);
-  h_pT_75Dxy->SetLineColor(6);
-
-  h_pT_noDxyEta1->SetLineWidth(3);
-  h_pT_noDxyEta1->SetLineColor(1);
-
-  h_pT_25DxyEta1->SetLineWidth(3);
-  h_pT_25DxyEta1->SetLineColor(2);
-
-  h_pT_50DxyEta1->SetLineWidth(3);
-  h_pT_50DxyEta1->SetLineColor(4);
-
-  h_pT_75DxyEta1->SetLineWidth(3);
-  h_pT_75DxyEta1->SetLineColor(6);
-
-  h_pT_noDxyEta2->SetLineWidth(3);
-  h_pT_noDxyEta2->SetLineColor(1);
-
-  h_pT_25DxyEta2->SetLineWidth(3);
-  h_pT_25DxyEta2->SetLineColor(2);
-
-  h_pT_50DxyEta2->SetLineWidth(3);
-  h_pT_50DxyEta2->SetLineColor(4);
-
-  h_pT_75DxyEta2->SetLineWidth(3);
-  h_pT_75DxyEta2->SetLineColor(6);
-
-  h_pT_noDxyEta3->SetLineWidth(3);
-  h_pT_noDxyEta3->SetLineColor(1);
-
-  h_pT_25DxyEta3->SetLineWidth(3);
-  h_pT_25DxyEta3->SetLineColor(2);
-
-  h_pT_50DxyEta3->SetLineWidth(3);
-  h_pT_50DxyEta3->SetLineColor(4);
-
-  h_pT_75DxyEta3->SetLineWidth(3);
-  h_pT_75DxyEta3->SetLineColor(6);
-
-  h_pT_noDxyDimu->SetLineWidth(3);
-  h_pT_noDxyDimu->SetLineColor(1);
-
-  h_pT_25DxyDimu->SetLineWidth(3);
-  h_pT_25DxyDimu->SetLineColor(2);
-
-  h_pT_50DxyDimu->SetLineWidth(3);
-  h_pT_50DxyDimu->SetLineColor(4);
-
-  h_pT_75DxyDimu->SetLineWidth(3);
-  h_pT_75DxyDimu->SetLineColor(6);
-
-  h_pT_noDxyDimu10->SetLineWidth(3);
-  h_pT_noDxyDimu10->SetLineColor(1);
-
-  h_pT_25DxyDimu10->SetLineWidth(3);
-  h_pT_25DxyDimu10->SetLineColor(2);
-
-  h_pT_50DxyDimu10->SetLineWidth(3);
-  h_pT_50DxyDimu10->SetLineColor(4);
-
-  h_pT_75DxyDimu10->SetLineWidth(3);
-  h_pT_75DxyDimu10->SetLineColor(6);
-
-  h_pT_noDxyDimu20->SetLineWidth(3);
-  h_pT_noDxyDimu20->SetLineColor(1);
-
-  h_pT_25DxyDimu20->SetLineWidth(3);
-  h_pT_25DxyDimu20->SetLineColor(2);
-
-  h_pT_50DxyDimu20->SetLineWidth(3);
-  h_pT_50DxyDimu20->SetLineColor(4);
-
-  h_pT_75DxyDimu20->SetLineWidth(3);
-  h_pT_75DxyDimu20->SetLineColor(6);
-
+  h_pT_Eta3->SetLineWidth(3);
+  h_pT_Eta3->SetLineColor(1);
  
   TString leg = "1.24 < |#eta| < 2.5";
-  TString leg2 = "|L1 Dxy| > 25 cm";
-  TString leg3 = "|L1 Dxy| > 50 cm";
-  TString leg4 = "|L1 Dxy| > 75 cm";
+  TString leg1 = "1.24 < |#eta| < 1.6";
+  TString leg2 = "1.6 < |#eta| < 2.1";
+  TString leg3 = "2.1 < |#eta| < 2.5";
 
 
   TCanvas * c1=new TCanvas("c1","c1",1200,1200);
@@ -464,107 +207,37 @@ int makeTriggerRatePlots(){
   // header.Draw();
   // gStyle->SetErrorY(0)
   if (doSingleMuon){
-    h_pT_noDxy->Draw("hist e0");
-    //  h_pT_25Dxy->Draw("hist same");
-    //h_pT_50Dxy->Draw("hist same");
-    //h_pT_75Dxy->Draw("hist same");
-    
+    h_pT->Draw("hist e0");    
     TLegend * leg11 =new TLegend(0.6,0.75,0.88,0.88);    
-    leg11->AddEntry(h_pT_noDxy,leg);
-    //leg11->AddEntry(h_pT_25Dxy,leg2);
-    //leg11->AddEntry(h_pT_50Dxy,leg3);
-    //leg11->AddEntry(h_pT_75Dxy,leg4);
+    leg11->AddEntry(h_pT,leg);
     leg11->Draw("sames");
 
     c1->SaveAs("./output_files/comparisons/rates/TriggerRate.pdf");
 
-    h_pT_noDxyEta1->Draw("hist");
-    h_pT_25DxyEta1->Draw("hist same");
-    h_pT_50DxyEta1->Draw("hist same");
-    h_pT_75DxyEta1->Draw("hist same");
+    h_pT_Eta1->Draw("hist e0");
     
     TLegend * leg22 =new TLegend(0.6,0.75,0.88,0.88);    
-    leg22->AddEntry(h_pT_noDxyEta1,leg);
-    leg22->AddEntry(h_pT_25DxyEta1,leg2);
-    leg22->AddEntry(h_pT_50DxyEta1,leg3);
-    leg22->AddEntry(h_pT_75DxyEta1,leg4);
+    leg22->AddEntry(h_pT_Eta1,leg1);
     leg22->Draw("sames");
 
     c1->SaveAs("./output_files/comparisons/rates/TriggerRate_eta1.pdf");
 
-    h_pT_noDxyEta2->Draw("hist");
-    h_pT_25DxyEta2->Draw("hist same");
-    h_pT_50DxyEta2->Draw("hist same");
-    h_pT_75DxyEta2->Draw("hist same");
+    h_pT_Eta2->Draw("hist e0");
     
     TLegend * leg33 =new TLegend(0.6,0.75,0.88,0.88);    
-    leg33->AddEntry(h_pT_noDxyEta2,leg);
-    leg33->AddEntry(h_pT_25DxyEta2,leg2);
-    leg33->AddEntry(h_pT_50DxyEta2,leg3);
-    leg33->AddEntry(h_pT_75DxyEta2,leg4);
+    leg33->AddEntry(h_pT_Eta2,leg2);
     leg33->Draw("sames");
 
     c1->SaveAs("./output_files/comparisons/rates/TriggerRate_eta2.pdf");
 
-    h_pT_noDxyEta3->Draw("hist");
-    h_pT_25DxyEta3->Draw("hist same");
-    h_pT_50DxyEta3->Draw("hist same");
-    h_pT_75DxyEta3->Draw("hist same");
+    h_pT_Eta3->Draw("hist e");
     
     TLegend * leg44 =new TLegend(0.6,0.75,0.88,0.88);    
-    leg44->AddEntry(h_pT_noDxyEta3,leg);
-    leg44->AddEntry(h_pT_25DxyEta3,leg2);
-    leg44->AddEntry(h_pT_50DxyEta3,leg3);
-    leg44->AddEntry(h_pT_75DxyEta3,leg4);
+    leg44->AddEntry(h_pT_Eta3,leg3);
     leg44->Draw("sames");
 
     c1->SaveAs("./output_files/comparisons/rates/TriggerRate_eta3.pdf");
   }
-
-  if (doDimuon){
-    h_pT_noDxyDimu->Draw("hist");
-    h_pT_25DxyDimu->Draw("hist same");
-    h_pT_50DxyDimu->Draw("hist same");
-    h_pT_75DxyDimu->Draw("hist same");
-    
-    TLegend * leg11 =new TLegend(0.6,0.75,0.88,0.88);    
-    leg11->AddEntry(h_pT_noDxyDimu,leg);
-    leg11->AddEntry(h_pT_25DxyDimu,leg2);
-    leg11->AddEntry(h_pT_50DxyDimu,leg3);
-    leg11->AddEntry(h_pT_75DxyDimu,leg4);
-    leg11->Draw("sames");
-
-    c1->SaveAs("./output_files/comparisons/rates/dimuon/NuGun_AdditionalRate_NNv6.pdf");
-
-    h_pT_noDxyDimu10->Draw("hist");
-    h_pT_25DxyDimu10->Draw("hist same");
-    h_pT_50DxyDimu10->Draw("hist same");
-    h_pT_75DxyDimu10->Draw("hist same");
-    
-    TLegend * leg22 =new TLegend(0.6,0.75,0.88,0.88);    
-    leg22->AddEntry(h_pT_noDxyDimu10,leg);
-    leg22->AddEntry(h_pT_25DxyDimu10,leg2);
-    leg22->AddEntry(h_pT_50DxyDimu10,leg3);
-    leg22->AddEntry(h_pT_75DxyDimu10,leg4);
-    leg22->Draw("sames");
-
-    c1->SaveAs("./output_files/comparisons/rates/dimuon/NuGun_asym10_AdditionalRate_NNv6.pdf");
-
-    h_pT_noDxyDimu20->Draw("hist");
-    h_pT_25DxyDimu20->Draw("hist same");
-    h_pT_50DxyDimu20->Draw("hist same");
-    h_pT_75DxyDimu20->Draw("hist same");
-    
-    TLegend * leg33 =new TLegend(0.6,0.75,0.88,0.88);    
-    leg33->AddEntry(h_pT_noDxyDimu20,leg);
-    leg33->AddEntry(h_pT_25DxyDimu20,leg2);
-    leg33->AddEntry(h_pT_50DxyDimu20,leg3);
-    leg33->AddEntry(h_pT_75DxyDimu20,leg4);
-    leg33->Draw("sames");
-
-    c1->SaveAs("./output_files/comparisons/rates/dimuon/NuGun_asym20_AdditionalRate_NNv6.pdf");
-  }
-
 
   return 0;
  }
