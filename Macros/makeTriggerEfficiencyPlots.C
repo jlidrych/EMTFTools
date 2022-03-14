@@ -39,7 +39,7 @@ int makeTriggerEfficiencyPlots(){
 
   //read data
   TString ntuple = "/nfs/dust/cms/user/lidrychj/EMTF/Emulator/CMSSW_12_3_0_pre4/src/matchedNtuple.root";
-
+                    
   TChain * cc=new TChain("tree");
   cc->Add(ntuple);
 
@@ -103,8 +103,6 @@ int makeTriggerEfficiencyPlots(){
   float dRThreshold = 1.0;
   int qualThreshold = 11;
   int modeThreshold = 11;
-  float dxyThresholdMin = 25.0;
-  float dxyThresholdMax = 100.0;
   float z0Threshold = 100.0;
   TString outputfileName = "outputfile.root";
 
@@ -150,9 +148,6 @@ int makeTriggerEfficiencyPlots(){
       // if (gendR[i] > dRThreshold) continue;
       if (abs(genMuEtaStar[i]) < etaThresholdMin) continue;
       if (abs(genMuEtaStar[i]) > etaThresholdMax) continue;
-      if (abs(genMuVz[i]) > z0Threshold) continue;
-      if (abs(genMuD0[i]) > dxyThresholdMax) continue;
-      // if (abs(gendxy[i]) < dxyThresholdMin) continue;
       if (genMuMatchedL1MuID[i] < 0) continue;
       if (!(l1MuEmtfMode[genMuMatchedL1MuID[i]] == 11 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 13 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 14 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 15)) continue;
 
@@ -187,9 +182,6 @@ int makeTriggerEfficiencyPlots(){
       // if (gendR[i] > dRThreshold) continue;
       if (abs(genMuEtaStar[i]) < 2.1) continue;
       if (abs(genMuEtaStar[i]) > etaThresholdMax) continue;
-      if (abs(genMuVz[i]) > z0Threshold) continue;
-      if (abs(genMuD0[i]) > dxyThresholdMax) continue;
-      // if (abs(gendxy[i]) < dxyThresholdMin) continue;
       if (genMuMatchedL1MuID[i] < 0) continue;
       if (!(l1MuEmtfMode[genMuMatchedL1MuID[i]] == 11 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 13 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 14 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 15)) continue;
 
@@ -217,9 +209,6 @@ int makeTriggerEfficiencyPlots(){
       // if (gendR[i] > dRThreshold) continue;
       if (abs(genMuEtaStar[i]) < 1.6) continue;
       if (abs(genMuEtaStar[i]) > 2.1) continue;
-      if (abs(genMuVz[i]) > z0Threshold) continue;
-      if (abs(genMuD0[i]) > dxyThresholdMax) continue;
-      // if (abs(gendxy[i]) < dxyThresholdMin) continue;
       if (genMuMatchedL1MuID[i] < 0) continue;
       if (!(l1MuEmtfMode[genMuMatchedL1MuID[i]] == 11 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 13 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 14 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 15)) continue;
 
@@ -247,12 +236,8 @@ int makeTriggerEfficiencyPlots(){
       // if (gendR[i] > dRThreshold) continue;
       if (abs(genMuEtaStar[i]) < etaThresholdMin) continue;
       if (abs(genMuEtaStar[i]) > 1.6) continue;
-      if (abs(genMuVz[i]) > z0Threshold) continue;
-      if (abs(genMuD0[i]) > dxyThresholdMax) continue;
-      // if (abs(gendxy[i]) < dxyThresholdMin) continue;
       if (genMuMatchedL1MuID[i] < 0) continue;
       if (!(l1MuEmtfMode[genMuMatchedL1MuID[i]] == 11 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 13 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 14 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 15)) continue;
-
 
       h_den_pt_eta1->Fill(genMuPt[i]);
 
