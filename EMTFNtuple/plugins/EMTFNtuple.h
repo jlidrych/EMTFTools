@@ -57,6 +57,14 @@
 
 #include "DataFormats/L1Trigger/interface/Muon.h"
 
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+#include "L1Trigger/L1TNtuples/interface/MuonID.h"
+#include "L1Trigger/L1TNtuples/interface/L1AnalysisRecoMuon2.h"
+
+// RECO vertices
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+
 //
 // ----------------------------------------------------
 //
@@ -114,6 +122,8 @@ class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     const edm::InputTag GMTUnpMuonTag_;
 
     const edm::InputTag GENPartTag_;
+    const edm::InputTag RECOMuonTag_;
+    const edm::InputTag RECOVertexTag_;
 
     // Reco CSC segments
     const edm::InputTag CSCSegmentTag_;
@@ -142,6 +152,7 @@ class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     bool useGMTUnpMuons_;
 
     bool useGENParts_;
+    bool useRECOMuons_;
     bool useEventInfo_;
 
     bool useCSCSegments_;
@@ -171,7 +182,9 @@ class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     edm::EDGetTokenT<l1t::MuonBxCollection> GMTUnpMuonToken_;
 
     edm::EDGetTokenT<reco::GenParticleCollection> GENPartToken_;
-
+    edm::EDGetTokenT<reco::MuonCollection> RECOMuonToken_;
+    edm::EDGetTokenT<reco::VertexCollection> RECOVertexToken_;
+  
     edm::EDGetTokenT<CSCSegmentCollection> CSCSegmentToken_;
 
     edm::ESGetToken<CSCGeometry, MuonGeometryRecord> cscGeomToken_;
@@ -200,6 +213,8 @@ class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     const l1t::MuonBxCollection *GMTUnpMuons_;
 
     const reco::GenParticleCollection *GENParts_;
+    const reco::MuonCollection *RECOMuons_;
+    const reco::VertexCollection *RECOVertices_;
 
     const CSCSegmentCollection *CSCSegments_;
 
@@ -470,6 +485,20 @@ class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     std::unique_ptr<std::vector<float>> genPart_vx;
     std::unique_ptr<std::vector<float>> genPart_vy;
     std::unique_ptr<std::vector<float>> genPart_vz;
+
+    //RECO muons
+    std::unique_ptr<std::vector<float>> recoMuon_pt;
+    std::unique_ptr<std::vector<float>> recoMuon_eta;
+    std::unique_ptr<std::vector<float>> recoMuon_phi;
+    std::unique_ptr<std::vector<float>> recoMuon_samPt;//StandAloneMuon pt
+    std::unique_ptr<std::vector<int16_t>> recoMuon_q;//charge
+    std::unique_ptr<std::vector<int16_t>> recoMuon_matchedStations;//matchedstation
+    std::unique_ptr<std::vector<float>> recoMuon_chi2Norm;
+    std::unique_ptr<std::vector<float>> recoMuon_iso;
+    std::unique_ptr<std::vector<bool>> recoMuon_isLoose;
+    std::unique_ptr<std::vector<bool>> recoMuon_isMedium;
+    std::unique_ptr<std::vector<bool>> recoMuon_isTight;
+    std::unique_ptr<int32_t> recoMuon_size;
 
     // Event info
     std::unique_ptr<std::vector<uint64_t>> eventInfo_event;
