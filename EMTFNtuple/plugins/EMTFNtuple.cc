@@ -578,7 +578,7 @@ void EMTFNtuple::analyze(const edm::Event &iEvent,
     if(useRECOMuons_){
 
       for (const auto &recoMu : *RECOMuons_) {
-	if(!isLooseMuonCustom(recoMu)) continue; // save only 
+	if(!isLooseMuonCustom(recoMu)) continue; 
 
 	recoMuon_pt->push_back(recoMu.pt());
 	recoMuon_eta->push_back(recoMu.eta());
