@@ -244,7 +244,7 @@ int makeTriggerEfficiencyPlots(){
         h_den_phi_eta1->Fill(genMuPhiStar[i]);
       }
 
-      if (genMuDR[i] > 0.6) continue;
+      if (genMuDR[i] > 0.1) continue;
       if (l1MuPt[genMuMatchedL1MuID[i]] < 0) continue;
       // if (!(l1MuEmtfMode[genMuMatchedL1MuID[i]] == 11 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 13 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 14 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 15)) continue;
       
@@ -342,7 +342,7 @@ int makeTriggerEfficiencyPlots(){
   error_phi_eta1->GetYaxis()->SetRangeUser(0.00001,1.2);
 
 
-  TString leg = "L1 pT (prompt) > 10 GeV";
+  TString leg = "L1 pT > 22 GeV";
 
   TString leg_etaFull = "1.2 < |#eta| < 2.5";
   TString leg_eta1 = "1.2 < |#eta| < 1.6";
@@ -405,23 +405,23 @@ int makeTriggerEfficiencyPlots(){
   legs.push_back(leg_eta2);
   legs.push_back(leg_eta3);
 
-  canvasname.push_back("eff_pt_pt10_NNv8vsBDT");
-  canvasname.push_back("eff_eta_pt10_NNv8vsBDT");
-  canvasname.push_back("eff_fine_eta_pt10_NNv8vsBDT");
-  canvasname.push_back("eff_fine_fine_eta_pt10_NNv8vsBDT");
-  canvasname.push_back("eff_phi_pt10_NNv8vsBDT");
+  canvasname.push_back("eff_pt_pt22");
+  canvasname.push_back("eff_eta_pt22");
+  canvasname.push_back("eff_fine_eta_pt22");
+  canvasname.push_back("eff_fine_fine_eta_pt22");
+  canvasname.push_back("eff_phi_pt22");
 
   //eta binned
-  canvasname.push_back("eff_pt_pt10_NNv8vsBDT_eta3");
-  canvasname.push_back("eff_phi_pt10_NNv8vsBDT_eta3");
+  canvasname.push_back("eff_pt_pt22_eta3");
+  canvasname.push_back("eff_phi_pt22_eta3");
 
   //eta binned
-  canvasname.push_back("eff_pt_pt10_NNv8vsBDT_eta2");
-  canvasname.push_back("eff_phi_pt10_NNv8vsBDT_eta2");
+  canvasname.push_back("eff_pt_pt22_eta2");
+  canvasname.push_back("eff_phi_pt22_eta2");
 
   //eta binned
-  canvasname.push_back("eff_pt_pt10_NNv8vsBDT_eta1");
-  canvasname.push_back("eff_phi_pt10_NNv8vsBDT_eta1");
+  canvasname.push_back("eff_pt_pt22_eta1");
+  canvasname.push_back("eff_phi_pt22_eta1");
 
 
   for (int i=0; i<canvasname.size(); i++){
@@ -458,7 +458,7 @@ int makeTriggerEfficiencyPlots(){
     leg->Draw("sames");
 
     // c1->SaveAs("./plots"+canvasname[i]+".png");
-    c1->SaveAs("./output_files/comparisons/efficiencies/NNv8/"+canvasname[i]+"_muGunFlatXYZ_denomModeCut.pdf");
+    c1->SaveAs("./output_files/trigger_efficiencies/"+canvasname[i]+"_denomModeCut.pdf");
     canvasname[i]="Canvas_name_already_used_action_skipping";
 
   }
