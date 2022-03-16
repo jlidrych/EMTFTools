@@ -96,14 +96,13 @@ int makeTriggerEfficiencyPlots(){
 
 
   // initialize cuts
-  float ptThreshold = 10.0;
+  float ptThreshold = 22.0;
   // float ptThresholdSecond = 5.0;
   float etaThresholdMin = 1.24;
   float etaThresholdMax = 2.5;
   float dRThreshold = 1.0;
   int qualThreshold = 11;
   int modeThreshold = 11;
-  float z0Threshold = 100.0;
   TString outputfileName = "outputfile.root";
 
   TH1F *h_den_pt = new TH1F("h_den_pt", "", 30, 0, 60);
@@ -161,7 +160,7 @@ int makeTriggerEfficiencyPlots(){
         h_den_phi->Fill(genMuPhiStar[i]);
       }
 
-      if (genMuDR[i] > 0.6) continue;
+      if (genMuDR[i] > 0.1) continue;
       if (l1MuPt[genMuMatchedL1MuID[i]] < 0) continue;
       // if (!(l1MuEmtfMode[genMuMatchedL1MuID[i]] == 11 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 13 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 14 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 15)) continue;
       
@@ -192,7 +191,7 @@ int makeTriggerEfficiencyPlots(){
         h_den_phi_eta3->Fill(genMuPhiStar[i]);
       }
 
-      if (genMuDR[i] > 0.6) continue;
+      if (genMuDR[i] > 0.1) continue;
       if (l1MuPt[genMuMatchedL1MuID[i]] < 0) continue;
       // if (!(l1MuEmtfMode[genMuMatchedL1MuID[i]] == 11 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 13 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 14 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 15)) continue;
       
@@ -218,7 +217,7 @@ int makeTriggerEfficiencyPlots(){
         h_den_phi_eta2->Fill(genMuPhiStar[i]);
       }
 
-      if (genMuDR[i] > 0.6) continue;
+      if (genMuDR[i] > 0.1) continue;
       if (l1MuPt[genMuMatchedL1MuID[i]] < 0) continue;
       // if (!(l1MuEmtfMode[genMuMatchedL1MuID[i]] == 11 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 13 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 14 || l1MuEmtfMode[genMuMatchedL1MuID[i]] == 15)) continue;
       
