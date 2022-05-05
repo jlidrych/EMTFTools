@@ -1,4 +1,4 @@
-/* EMTF Rate Analysis plotting script
+/* EMTF pt resolution Analysis plotting script
  *
  */
 
@@ -9,37 +9,6 @@
 #include "TLatex.h"
 #include <boost/algorithm/string.hpp>
 #define SF TString::Format
-
-float DPhi(double phi1,double phi2){
-  float temp=phi1-phi2;
-  if (temp>3.14) temp=temp-6.28;
-  if (temp<-3.14) temp=temp+6.28;
-  return temp;
-}
-
-TLatex cms_latex(){
-  TLatex cms_label;
-  cms_label.SetTextSize(0.04);
-  cms_label.DrawLatexNDC(0.1, 0.92, "#bf{ #font[22]{CMS} #font[72]{Preliminary Simulation}}");
-  return cms_label;
-}
-
-TLatex head(){
-  TLatex header; 
-  header.SetTextSize(0.03);
-  // header.DrawLatexNDC(0.63, 0.92, "#sqrt{s} = 13 TeV, Run 3 MC");
-  header.DrawLatexNDC(0.63, 0.92, "BDT");
-  return header; 
-}
-
-int DefaultColor(int j,int i){
-  if (j-i==1) return 2;
-  else if (j-i==2) return 4;
-  else if (j-i==3) return 6;
-  else if (j-i==4) return 8;
-  else if (j-i==5) return 9;
-  else return j;
-}
 
 
 int makeResolutionPlots(){
