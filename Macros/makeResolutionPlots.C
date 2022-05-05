@@ -81,8 +81,8 @@ int makeResolutionPlots(){
   TH1F *h_resolution_eta1 = new TH1F("h_resolution_eta1", "", 40, -2., 2.);
   //
   TH1F *h_resolution = new TH1F("h_resolution", "", 140, -2., 12.);
-  TH2F *h_resolution_pt = new TH2F("h_resolution_pt", "", 40, -1., 3.,250,0,1);
-  TH2F *h_resolution_deltaR = new TH2F("h_resolution_deltaR", "", 40, -1., 3.,50,0,1);
+  TH2F *h_resolution_pt = new TH2F("h_resolution_pt", "", 40, -1., 3.,250,0.,250.);
+  TH2F *h_resolution_deltaR = new TH2F("h_resolution_deltaR", "", 40, -1., 3.,50,0.,1.);
 
 
   std::cout<<"Running on "<<cc->GetEntries()<<" evts "<<std::endl;
