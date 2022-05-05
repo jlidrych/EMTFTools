@@ -139,7 +139,6 @@ int makeResolutionPlots(){
 	//	std::cout<<"pt, eta, phi: "<<genPartPt[i]<<" "<<genPartEta[i]<<" "<<genPartPhi[i]<<std::endl;
 	//	std::cout<<" gmt: "<<gmtMuonPt[gmt_idx]<<" "<<gmtMuonEta[gmt_idx]<<" "<<gmtMuonPhi[gmt_idx]<<std::endl;
 
-	double var = (gmtMuonPt[gmt_idx] -genPartPt[i])/genPartPt[i];
 
 	if(abs(genPartEta[i]) > 1.2 && abs(genPartEta[i]) < 2.5){
           h_resolution->Fill(var);
