@@ -10,6 +10,12 @@
 #include <boost/algorithm/string.hpp>
 #define SF TString::Format
 
+float DPhi(double phi1,double phi2){
+  float temp=phi1-phi2;
+  if (temp>3.14) temp=temp-6.28;
+  if (temp<-3.14) temp=temp+6.28;
+  return temp;
+}
 
 int makeResolutionPlots(){
 
@@ -83,6 +89,7 @@ int makeResolutionPlots(){
   
   while(reader.Next()){
     /*
+    // just for print out
     std::cout<<"next event..."<<std::endl;
     std::cout<<"Unp GMT muons: "<<std::endl;
     for(int i = 0; i < *gmtUnpMuonSize; ++i){
@@ -130,37 +137,40 @@ int makeResolutionPlots(){
         }
       }// gmtMuonSize
 
-      double var = (gmtMuonPt[gmt_idx] -genPartPt[i])/genPartPt[i];
+      if(gmt_idx >= 0){
+	
+	double var = (gmtMuonPt[gmt_idx] -genPartPt[i])/genPartPt[i];
       //      double var = (genPartCharge[i]/genPartPt[i] - gmtMuonCharge[gmt_idx]/gmtMuonPt[gmt_idx]) / (genPartCharge[i]/genPartPt[i]);
-      if(gmt_idx >= 0)
+      
 	h_resolution_deltaR->Fill(var, dR);
 
-      if(gmt_idx >= 0 && dR < 0.2){
-	//	std::cout<<"pt, eta, phi: "<<genPartPt[i]<<" "<<genPartEta[i]<<" "<<genPartPhi[i]<<std::endl;
-	//	std::cout<<" gmt: "<<gmtMuonPt[gmt_idx]<<" "<<gmtMuonEta[gmt_idx]<<" "<<gmtMuonPhi[gmt_idx]<<std::endl;
-
-
-	if(abs(genPartEta[i]) > 1.2 && abs(genPartEta[i]) < 2.5){
-          h_resolution->Fill(var);
-	  h_resolution_pt->Fill( var, genPartPt[i]);
-	}
-	if(abs(genPartEta[i]) > 2.1 && abs(genPartEta[i]) < 2.5)
-	  h_resolution_eta3->Fill(var);
-
-	if(abs(genPartEta[i]) > 1.6 && abs(genPartEta[i]) < 2.1)
-          h_resolution_eta2->Fill(var);
-
-	if(abs(genPartEta[i]) > 1.2 && abs(genPartEta[i]) < 1.6)
-          h_resolution_eta1->Fill(var);
+	if(dR < 0.2){
+	  //	std::cout<<"pt, eta, phi: "<<genPartPt[i]<<" "<<genPartEta[i]<<" "<<genPartPhi[i]<<std::endl;
+	  //	std::cout<<" gmt: "<<gmtMuonPt[gmt_idx]<<" "<<gmtMuonEta[gmt_idx]<<" "<<gmtMuonPhi[gmt_idx]<<std::endl;
+	  
+	  
+	  if(abs(genPartEta[i]) > 1.2 && abs(genPartEta[i]) < 2.5){
+	    h_resolution->Fill(var);
+	    h_resolution_pt->Fill( var, genPartPt[i]);
+	  }
+	  if(abs(genPartEta[i]) > 2.1 && abs(genPartEta[i]) < 2.5)
+	    h_resolution_eta3->Fill(var);
+	  
+	  if(abs(genPartEta[i]) > 1.6 && abs(genPartEta[i]) < 2.1)
+	    h_resolution_eta2->Fill(var);
+	  
+	  if(abs(genPartEta[i]) > 1.2 && abs(genPartEta[i]) < 1.6)
+	    h_resolution_eta1->Fill(var);
 	
-	if(abs(genPartEta[i]) > 1.2 && abs(genPartEta[i]) < 1.5)
-          h_resolution_eta4->Fill(var);
-
-	if(abs(genPartEta[i]) > 1.5 && abs(genPartEta[i]) < 2.2)
-	  h_resolution_eta5->Fill(var);
-
-	if(abs(genPartEta[i]) > 2.2 && abs(genPartEta[i]) < 2.6)
-	  h_resolution_eta6->Fill(var);
+	  if(abs(genPartEta[i]) > 1.2 && abs(genPartEta[i]) < 1.5)
+	    h_resolution_eta4->Fill(var);
+	  
+	  if(abs(genPartEta[i]) > 1.5 && abs(genPartEta[i]) < 2.2)
+	    h_resolution_eta5->Fill(var);
+	  
+	  if(abs(genPartEta[i]) > 2.2 && abs(genPartEta[i]) < 2.6)
+	    h_resolution_eta6->Fill(var);
+	}
       }
     }
   }
