@@ -17,3 +17,14 @@ scram b -j 10
 ```bash
 cmsRun l1NtupleMC_RAW2DIGI.py
 ```
+## Ntuple production
+Scripts for ntuple production are available in ```bash crab``` directory.
+SingleNeutrino sample is used for trigger rate study, while the DYToLL sample is used for the trigger efficiency measurement.
+We use so called ```bash GEN-SIM-DIGI-RAW``` production.
+```bash
+crab submit -c crabSingleNeutrino.py
+```
+or
+```bash
+crab submit -c crabDY.py
+```
