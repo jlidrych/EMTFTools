@@ -23,7 +23,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+//#include <regex>
+#include <boost/regex.hpp>
 // ROOT includes
 #include "TFile.h"
 #include "TMath.h"
@@ -57,28 +58,61 @@
 
 #include "DataFormats/L1Trigger/interface/Muon.h"
 
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+#include "L1Trigger/L1TNtuples/interface/MuonID.h"
+//#include "L1Trigger/L1TNtuples/interface/L1AnalysisRecoMuon2.h"
+
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/HitPattern.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/MuonReco/interface/MuonSelectors.h"
+#include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
+#include "DataFormats/RecoCandidate/interface/RecoChargedCandidateFwd.h"
+// RECO vertices
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+// HLT configuration
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 //
+// RECO muon track extrapolation
+#include "MuonAnalysis/MuonAssociators/interface/PropagateToMuon.h"
+#include "TrackingTools/TrajectoryState/interface/TrajectoryStateOnSurface.h"
+// HLT trigger
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "DataFormats/HLTReco/interface/TriggerEvent.h"
+#include "DataFormats/HLTReco/interface/TriggerObject.h"
+#include "DataFormats/Math/interface/deltaR.h"
 // ----------------------------------------------------
 //
 
-class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
+class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources,edm::one::WatchRuns> {
   public:
     explicit EMTFNtuple(const edm::ParameterSet &);
     ~EMTFNtuple();
 
     static void fillDescriptions(edm::ConfigurationDescriptions &descriptions);
-
+  
   private:
     void beginJob() override;
+    void beginRun(const edm::Run&,   const edm::EventSetup&);
+    void endRun(const edm::Run&,   const edm::EventSetup&);
     auto getHitRefs(const l1t::EMTFTrack &trk,
                     const l1t::EMTFHitCollection &hits);
+  
+    auto hltMatching(const reco::Muon muon, 
+		     const trigger::TriggerEvent* trigEvent,
+		     std::vector<std::string> trigModLabels,
+		     const double _muon_trig_dR,
+		     const double _muon_trig_pt);
+
     void analyze(const edm::Event &, const edm::EventSetup &) override;
     void endJob() override;
-
+  
     // Aux functions
     void getHandles(const edm::Event &iEvent, const edm::EventSetup &iSetup);
     void fillTree();
     void makeTree();
+  
 
     template <typename T> edm::Handle<T> make_handle(T &t) {
         return edm::Handle<T>();
@@ -114,6 +148,17 @@ class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     const edm::InputTag GMTUnpMuonTag_;
 
     const edm::InputTag GENPartTag_;
+    const edm::InputTag RECOMuonTag_;
+    const edm::InputTag RECOVertexTag_;
+
+    // User defined settings
+    const std::vector<std::string> muonTriggers_;  // List of unprescale SingleMuon triggers
+  
+    const edm::InputTag RECOBeamSpotTag_;
+    const edm::InputTag TriggerEventTag_;
+    // HLT trigger matching
+    std::vector<std::string> trigNames_;      // HLT triggers matching the desired names
+    std::vector<std::string> trigModLabels_;  // HLT 3rd-to-last module label for each trigger
 
     // Reco CSC segments
     const edm::InputTag CSCSegmentTag_;
@@ -142,6 +187,7 @@ class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     bool useGMTUnpMuons_;
 
     bool useGENParts_;
+    bool useRECOMuons_;
     bool useEventInfo_;
 
     bool useCSCSegments_;
@@ -171,14 +217,22 @@ class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     edm::EDGetTokenT<l1t::MuonBxCollection> GMTUnpMuonToken_;
 
     edm::EDGetTokenT<reco::GenParticleCollection> GENPartToken_;
-
+    edm::EDGetTokenT<reco::MuonCollection> RECOMuonToken_;
+    edm::EDGetTokenT<reco::VertexCollection> RECOVertexToken_;
+    edm::EDGetTokenT<reco::BeamSpot> RECOBeamSpotToken_;
+    edm::EDGetTokenT<trigger::TriggerEvent> TriggerEventToken_;
+  
     edm::EDGetTokenT<CSCSegmentCollection> CSCSegmentToken_;
 
     edm::ESGetToken<CSCGeometry, MuonGeometryRecord> cscGeomToken_;
     edm::ESHandle<CSCGeometry> cscGeom_;
 
-    GeometryTranslator geometryTranslator_;
 
+
+    PropagateToMuon muProp1st_;
+    PropagateToMuon muProp2nd_;
+    GeometryTranslator geometryTranslator_;
+    HLTConfigProvider hltConfig_;
     EMTFSubsystemCollector collector_;
 
     TriggerPrimitiveCollection CSCInputs_;
@@ -200,7 +254,10 @@ class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     const l1t::MuonBxCollection *GMTUnpMuons_;
 
     const reco::GenParticleCollection *GENParts_;
-
+    const reco::MuonCollection *RECOMuons_;
+    const reco::VertexCollection *RECOVertices_;
+    const reco::BeamSpot *RECOBeamSpot_;
+    const trigger::TriggerEvent *TriggerEvents_;
     const CSCSegmentCollection *CSCSegments_;
 
     // TTree
@@ -470,6 +527,33 @@ class EMTFNtuple : public edm::one::EDAnalyzer<edm::one::SharedResources> {
     std::unique_ptr<std::vector<float>> genPart_vx;
     std::unique_ptr<std::vector<float>> genPart_vy;
     std::unique_ptr<std::vector<float>> genPart_vz;
+
+    //RECO muons
+    std::unique_ptr<std::vector<float>> recoMuon_pt;
+    std::unique_ptr<std::vector<float>> recoMuon_eta;
+    std::unique_ptr<std::vector<float>> recoMuon_eta_st1;
+    std::unique_ptr<std::vector<float>> recoMuon_eta_st2;
+    std::unique_ptr<std::vector<float>> recoMuon_phi;
+    std::unique_ptr<std::vector<float>> recoMuon_phi_st1;
+    std::unique_ptr<std::vector<float>> recoMuon_phi_st2;
+    std::unique_ptr<std::vector<float>> recoMuon_theta;
+    std::unique_ptr<std::vector<float>> recoMuon_theta_st1;
+    std::unique_ptr<std::vector<float>> recoMuon_theta_st2;
+    std::unique_ptr<std::vector<float>> recoMuon_dxy_bs; //beam spot
+    std::unique_ptr<std::vector<float>> recoMuon_dz_bs;
+    std::unique_ptr<std::vector<float>> recoMuon_dxy_pv; //primary vertex
+    std::unique_ptr<std::vector<float>> recoMuon_dz_pv; 
+    std::unique_ptr<std::vector<float>> recoMuon_samPt;//StandAloneMuon pt
+    std::unique_ptr<std::vector<int16_t>> recoMuon_q;//charge
+    std::unique_ptr<std::vector<int16_t>> recoMuon_matchedStations;//matchedstation
+    std::unique_ptr<std::vector<float>> recoMuon_chi2Norm;
+    std::unique_ptr<std::vector<float>> recoMuon_iso;
+    std::unique_ptr<std::vector<bool>> recoMuon_isLoose;
+    std::unique_ptr<std::vector<bool>> recoMuon_isMedium;
+    std::unique_ptr<std::vector<bool>> recoMuon_isTight;
+    std::unique_ptr<std::vector<float>> recoMuon_hlt_dR;
+    std::unique_ptr<std::vector<int16_t>> recoMuon_hlt_ID; 
+    std::unique_ptr<int32_t> recoMuon_size;
 
     // Event info
     std::unique_ptr<std::vector<uint64_t>> eventInfo_event;

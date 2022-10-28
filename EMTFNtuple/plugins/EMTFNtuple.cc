@@ -38,6 +38,11 @@ EMTFNtuple::EMTFNtuple(const edm::ParameterSet &iConfig)
       GMTUnpMuonTag_(iConfig.getParameter<edm::InputTag>("GMTUnpMuonTag")),
 
       GENPartTag_(iConfig.getParameter<edm::InputTag>("GENPartTag")),
+      RECOMuonTag_(iConfig.getParameter<edm::InputTag>("RECOMuonTag")),
+      RECOVertexTag_(iConfig.getParameter<edm::InputTag>("RECOVertexTag")),
+      muonTriggers_(iConfig.getParameter<std::vector<std::string> >("muonTriggers")),
+      RECOBeamSpotTag_(iConfig.getParameter<edm::InputTag>("RECOBeamSpotTag")),
+      TriggerEventTag_(iConfig.getParameter<edm::InputTag>("TriggerEventTag")),
 
       CSCSegmentTag_(iConfig.getParameter<edm::InputTag>("CSCSegmentTag")),
 
@@ -65,15 +70,16 @@ EMTFNtuple::EMTFNtuple(const edm::ParameterSet &iConfig)
       useGMTUnpMuons_(iConfig.getParameter<bool>("useGMTUnpMuons")),
 
       useGENParts_(iConfig.getParameter<bool>("useGENParts")),
+      useRECOMuons_(iConfig.getParameter<bool>("useRECOMuons")),
       useEventInfo_(iConfig.getParameter<bool>("useEventInfo")),
 
       useCSCSegments_(iConfig.getParameter<bool>("useCSCSegments")),
       matchCSCSegments_(iConfig.getParameter<bool>("matchCSCSegments")),
 
       isReco_(iConfig.getParameter<bool>("isReco")),
-
+      muProp1st_(iConfig.getParameter<edm::ParameterSet>("muProp1st"),consumesCollector()), // Propagate RECO muon coordinates to 1st muon station
+      muProp2nd_(iConfig.getParameter<edm::ParameterSet>("muProp2nd"),consumesCollector()),  // Propagate RECO muon coordinates to 2nd muon station
       geometryTranslator_(consumesCollector())
-
 {
     usesResource("TFileService"); // shared resources
 
@@ -98,7 +104,10 @@ EMTFNtuple::EMTFNtuple(const edm::ParameterSet &iConfig)
     GMTUnpMuonToken_ = consumes<l1t::MuonBxCollection>(GMTUnpMuonTag_);
 
     GENPartToken_ = consumes<reco::GenParticleCollection>(GENPartTag_);
-
+    RECOMuonToken_ = consumes<reco::MuonCollection>(RECOMuonTag_);
+    RECOVertexToken_ = consumes<reco::VertexCollection>(RECOVertexTag_);
+    RECOBeamSpotToken_ = consumes<reco::BeamSpot>(RECOBeamSpotTag_);
+    TriggerEventToken_ = consumes<trigger::TriggerEvent>(TriggerEventTag_);
     CSCSegmentToken_ = consumes<CSCSegmentCollection>(CSCSegmentTag_);
 
     cscGeomToken_ = esConsumes<CSCGeometry, MuonGeometryRecord>();
@@ -107,6 +116,93 @@ EMTFNtuple::EMTFNtuple(const edm::ParameterSet &iConfig)
 EMTFNtuple::~EMTFNtuple() {
     // Do nothing
 }
+
+// Called once per run
+void EMTFNtuple::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) {
+
+  if(useRECOMuons_==false) return;
+  
+  bool changed = true;
+  if (not hltConfig_.init(iRun, iSetup, "HLT", changed)) {
+    std::cout << "\n\nTrying to set up HLT, could not!!!" << std::endl;
+    std::cout << "Quitting.\n\n" << std::endl;
+    assert(false);
+  }
+  
+  const boost::regex rgx("_v[0-9]+");
+
+  for (unsigned i = 0; i < hltConfig_.size(); i++) {
+    std::string trigName = hltConfig_.triggerName(i);
+    std::string trigNameStripped = boost::regex_replace(trigName, rgx, "", boost::match_default | boost::format_sed);
+
+    for (unsigned j = 0; j < muonTriggers_.size(); j++) {
+      if (trigNameStripped == muonTriggers_.at(j)) {
+	std::cout << "\nTrigger #" << i << ": " << trigName << "(" << trigNameStripped << ") matches " << muonTriggers_.at(j) << std::endl;
+	trigNames_    .push_back(trigName);
+	trigModLabels_.push_back(hltConfig_.moduleLabels(i).at(hltConfig_.size(i) - 2));
+	std::cout << "  * Module index " << hltConfig_.size(i) - 2 << " returns label " << trigModLabels_.back()<<"\n"<< std::endl;
+      }
+    }
+  }
+  
+  if (trigNames_.size() == 0 || trigNames_.size() > muonTriggers_.size()) {
+    std::cout << "\nFound " << trigNames_.size() << " triggers matching: ";
+    for (unsigned i = 0; i < muonTriggers_.size(); i++) {
+      std::cout << muonTriggers_.at(i) << " or ";
+    } std::cout << "\n" << std::endl;
+    for (unsigned i = 0; i < trigNames_.size(); i++) {
+      std::cout << "  * Trigger #" << i << ": " << trigNames_.at(i) << std::endl;
+    }
+    assert(false);
+  }
+}
+
+// Called once per run
+void EMTFNtuple::endRun(const edm::Run& iRun, const edm::EventSetup& iSetup) {
+}  
+
+
+// Find the distance from the muon to one firing the HLT path
+auto EMTFNtuple::hltMatching( const reco::Muon muon,
+			      const trigger::TriggerEvent* trigEvent,
+			      std::vector<std::string> trigModLabels,
+			      const double _muon_trig_dR, const double _muon_trig_pt ) {
+  
+  //   std::cout << "Inside RecoMuonInfo::HltMatch, muon has charge = " << muon.charge() << ", pT = " << muon.pt()
+  //	    << ", eta = " << muon.eta() << ", phi() = " << muon.phi() << std::endl;
+
+  double matchDR = 999.;  // deltaR between HLT muon and RECO muon
+  int    matchID = -999;  // bitmask of which HLT muons are matched to the RECO muon
+  
+  const trigger::TriggerObjectCollection trigObjs = trigEvent->getObjects();
+
+  for (unsigned i = 0; i < trigModLabels.size(); i++) {
+    const unsigned iFilter = trigEvent->filterIndex( edm::InputTag ( trigModLabels.at(i), "", "HLT" ) );
+
+    if (iFilter < trigEvent->sizeFilters()) {
+      const trigger::Keys triggerKeys(trigEvent->filterKeys(iFilter));
+      const trigger::Vids triggerVids(trigEvent->filterIds(iFilter));
+      
+      for (unsigned iVid = 0; iVid < triggerVids.size(); iVid++) {
+	const trigger::TriggerObject trigObject = trigObjs.at(triggerKeys.at(iVid));
+	if (deltaR(muon, trigObject) < _muon_trig_dR && muon.pt() > _muon_trig_pt) {
+	  matchDR  = std::min(matchDR, deltaR(muon, trigObject));
+	  matchID  = std::max(matchID, 0);
+	  matchID |= int(pow(2, i));
+	  //	  std::cout << "  * Trigger " << i << ": matched with dR = " << matchDR << " to module:" << trigModLabels.at(i) 
+	  //     << ", key:" << triggerKeys.at(iVid) << ", object ID = " << trigObject.id()
+	  //     << ", pT = " << trigObject.pt() << ", eta = " << trigObject.eta() << ", phi = " << trigObject.phi() << std::endl;
+	}
+      }
+    }
+  }
+  
+  recoMuon_hlt_dR->push_back(matchDR);
+  recoMuon_hlt_ID->push_back(matchID);
+
+}
+
+
 
 auto EMTFNtuple::getHitRefs(const l1t::EMTFTrack &trk,
                             const l1t::EMTFHitCollection &hits) {
@@ -569,7 +665,99 @@ void EMTFNtuple::analyze(const edm::Event &iEvent,
             genPart_vz->push_back(part.vz());
         }
     }
+    
+    if(useRECOMuons_){
 
+      for (const auto &recoMu : *RECOMuons_) {
+
+	//remove bad muons 
+	if(!muon::isLooseMuon(recoMu)) continue;
+	if(!muon::isSoftMuon(recoMu,RECOVertices_->at(0))) continue;
+	if(!recoMu.isStandAloneMuon()) continue;
+	if(recoMu.pt() < 0.5) continue;
+
+	reco::Track track;
+        if(recoMu.isGlobalMuon()) track = *(recoMu.globalTrack());
+        else if(recoMu.isTrackerMuon()) track = *(recoMu.innerTrack());
+        else if(recoMu.isStandAloneMuon()) track = *(recoMu.outerTrack());
+        else{
+          continue;
+        }
+
+	// set up muon propagator for this event
+	muProp1st_.init(iSetup);
+	muProp2nd_.init(iSetup);
+
+	TrajectoryStateOnSurface station1 = muProp1st_.extrapolate(recoMu);
+	TrajectoryStateOnSurface station2 = muProp2nd_.extrapolate(recoMu);
+
+	float eta_St1   = -999.;
+	float theta_St1 = -999.;
+	float phi_St1   = -999.;
+	float eta_St2   = -999.;
+	float theta_St2 = -999.;
+	float phi_St2   = -999.;
+
+	if (station1.isValid()) {
+	  eta_St1 = station1.globalPosition().eta();
+	  theta_St1 = emtf::wrap_theta_deg( emtf::calc_theta_deg( eta_St1 ) );
+	  phi_St1 = station1.globalPosition().phi();
+	  //  phi_St1 = emtf::rad_to_deg(phi_St1);
+	}
+
+	if (station2.isValid()) {
+          eta_St2 = station2.globalPosition().eta();
+          theta_St2 = emtf::wrap_theta_deg( emtf::calc_theta_deg( eta_St2 ) );
+	  phi_St2 = station2.globalPosition().phi();
+        }
+
+	float etaMax = 3.;
+	if( abs(recoMu.eta()) > etaMax || abs(eta_St1) > etaMax || abs(eta_St2) > etaMax) continue; 
+
+	recoMuon_pt->push_back(recoMu.pt());
+	recoMuon_eta->push_back(recoMu.eta());
+	recoMuon_eta_st1->push_back(eta_St1);
+	recoMuon_eta_st2->push_back(eta_St2);
+
+	recoMuon_phi->push_back(recoMu.phi());
+        recoMuon_phi_st1->push_back(phi_St1);
+        recoMuon_phi_st2->push_back(phi_St2);
+
+	recoMuon_theta->push_back(emtf::wrap_theta_deg( emtf::calc_theta_deg( recoMu.eta() ) ));
+	recoMuon_theta_st1->push_back(theta_St1);
+	recoMuon_theta_st2->push_back(theta_St2);
+
+        recoMuon_isLoose->push_back(muon::isLooseMuon(recoMu));
+        recoMuon_isMedium->push_back(muon::isMediumMuon(recoMu));
+        recoMuon_isTight->push_back(muon::isTightMuon(recoMu,RECOVertices_->at(0)));
+
+        double iso = (recoMu.pfIsolationR04().sumChargedHadronPt +
+                      max(0.,
+                          recoMu.pfIsolationR04().sumNeutralHadronEt + recoMu.pfIsolationR04().sumPhotonEt -
+                          0.5 * recoMu.pfIsolationR04().sumPUPt)) /recoMu.pt();
+
+        recoMuon_iso->push_back(iso);
+        recoMuon_q->push_back(recoMu.charge());
+        recoMuon_chi2Norm->push_back(recoMu.numberOfMatchedStations());
+	recoMuon_samPt->push_back(recoMu.standAloneMuon()->pt());
+
+        if(recoMu.isGlobalMuon())
+          recoMuon_matchedStations->push_back(recoMu.globalTrack()->normalizedChi2());
+        else
+          recoMuon_matchedStations->push_back(-999.);
+
+
+	recoMuon_dxy_bs->push_back(track.dxy(RECOBeamSpot_->position()));
+	recoMuon_dz_bs->push_back(track.dz(RECOBeamSpot_->position()));
+	recoMuon_dxy_pv->push_back(track.dxy(RECOVertices_->at(0).position()));
+	recoMuon_dz_pv->push_back(track.dz(RECOVertices_->at(0).position()));
+
+	float deltaR = 0.01; //deltaR cut for reco and HLT matching
+	float pTmin = 25.; // pt threshold for recomu to be used for matching HLT object
+	hltMatching(recoMu,TriggerEvents_,trigModLabels_, deltaR, pTmin);
+      }
+      (*recoMuon_size) = recoMuon_pt->size();
+    }
 
     // CSC Segments
     if (useCSCSegments_) {
@@ -1058,6 +1246,7 @@ void EMTFNtuple::fillDescriptions(
     // validation
     // Please change this to state exactly what you do use, even if it is no
     // parameters
+  //  std::cout<<"i am here in filldescriptions"<<std::endl;
     edm::ParameterSetDescription desc;
     desc.setUnknown();
     descriptions.addDefault(desc);
@@ -1206,6 +1395,10 @@ void EMTFNtuple::getHandles(const edm::Event &iEvent,
     auto GMTUnpMuons_handle = make_handle(GMTUnpMuons_);
 
     auto GENParts_handle = make_handle(GENParts_);
+    auto RECOMuons_handle = make_handle(RECOMuons_);
+    auto RECOVertices_handle = make_handle(RECOVertices_);
+    auto RECOBeamSpot_handle = make_handle(RECOBeamSpot_);
+    auto TriggerEvents_handle = make_handle(TriggerEvents_);
 
     if (useGMTMuons_) {
         if (!GMTMuonToken_.isUninitialized()) {
@@ -1253,7 +1446,61 @@ void EMTFNtuple::getHandles(const edm::Event &iEvent,
     } else {
         GENParts_ = nullptr;
     }
+
+    if (useRECOMuons_) {
+      if (!RECOMuonToken_.isUninitialized()) {
+	iEvent.getByToken(RECOMuonToken_, RECOMuons_handle);
+      }
+      if (!RECOMuons_handle.isValid()) {
+	if (firstEvent_)
+	  edm::LogError("NtupleMaker")
+	    << "Cannot get the product: " << RECOMuonTag_;
+	RECOMuons_ = nullptr;
+      } else {
+	RECOMuons_ = RECOMuons_handle.product();
+      }
+      if (!RECOVertexToken_.isUninitialized()) {
+        iEvent.getByToken(RECOVertexToken_, RECOVertices_handle);
+      }
+      if (!RECOVertices_handle.isValid()) {
+        if (firstEvent_)
+	  edm::LogError("NtupleMaker")
+            << "Cannot get the product: " << RECOVertexTag_;
+        RECOVertices_ = nullptr;
+      } else {
+        RECOVertices_ = RECOVertices_handle.product();
+      }
+      if (!RECOBeamSpotToken_.isUninitialized()) {
+        iEvent.getByToken(RECOBeamSpotToken_, RECOBeamSpot_handle);
+      }
+      if (!RECOBeamSpot_handle.isValid()) {
+        if (firstEvent_)
+	  edm::LogError("NtupleMaker")
+            << "Cannot get the product: " << RECOBeamSpotTag_;
+        RECOBeamSpot_ = nullptr;
+      } else {
+        RECOBeamSpot_ = RECOBeamSpot_handle.product();
+      }
+      if (!TriggerEventToken_.isUninitialized()) {
+        iEvent.getByToken(TriggerEventToken_, TriggerEvents_handle);
+      }
+      if (!TriggerEvents_handle.isValid()) {
+        if (firstEvent_)
+	  edm::LogError("NtupleMaker")
+            << "Cannot get the product: " << TriggerEventTag_;
+        TriggerEvents_ = nullptr;
+      } else {
+	TriggerEvents_ = TriggerEvents_handle.product();
+      }
+    } else {
+      RECOMuons_ = nullptr;
+      RECOVertices_ = nullptr;
+      RECOBeamSpot_ = nullptr;
+      TriggerEvents_ = nullptr;
+    }
+
 }
+
 
 void EMTFNtuple::makeTree() {
 
@@ -1539,6 +1786,33 @@ void EMTFNtuple::makeTree() {
     genPart_vx = std::make_unique<std::vector<float>>();
     genPart_vy = std::make_unique<std::vector<float>>();
     genPart_vz = std::make_unique<std::vector<float>>();
+
+    // RECO Muon
+    recoMuon_pt = std::make_unique<std::vector<float>>();
+    recoMuon_eta = std::make_unique<std::vector<float>>();
+    recoMuon_eta_st1 = std::make_unique<std::vector<float>>();
+    recoMuon_eta_st2 = std::make_unique<std::vector<float>>();
+    recoMuon_phi = std::make_unique<std::vector<float>>();
+    recoMuon_phi_st1 = std::make_unique<std::vector<float>>();
+    recoMuon_phi_st2 = std::make_unique<std::vector<float>>();
+    recoMuon_theta = std::make_unique<std::vector<float>>();
+    recoMuon_theta_st1 = std::make_unique<std::vector<float>>();
+    recoMuon_theta_st2 = std::make_unique<std::vector<float>>();
+    recoMuon_samPt = std::make_unique<std::vector<float>>();
+    recoMuon_q = std::make_unique<std::vector<int16_t>>();
+    recoMuon_matchedStations = std::make_unique<std::vector<int16_t>>();
+    recoMuon_chi2Norm = std::make_unique<std::vector<float>>();
+    recoMuon_iso = std::make_unique<std::vector<float>>();
+    recoMuon_isLoose = std::make_unique<std::vector<bool>>();
+    recoMuon_isMedium = std::make_unique<std::vector<bool>>();
+    recoMuon_isTight = std::make_unique<std::vector<bool>>();
+    recoMuon_size = std::make_unique<int32_t>(0);
+    recoMuon_dxy_bs = std::make_unique<std::vector<float>>();
+    recoMuon_dz_bs = std::make_unique<std::vector<float>>();
+    recoMuon_dxy_pv = std::make_unique<std::vector<float>>();
+    recoMuon_dz_pv = std::make_unique<std::vector<float>>();
+    recoMuon_hlt_dR = std::make_unique<std::vector<float>>();
+    recoMuon_hlt_ID = std::make_unique<std::vector<int16_t>>();
 
     // Event info
     eventInfo_event = std::make_unique<std::vector<uint64_t>>();
@@ -1873,6 +2147,34 @@ void EMTFNtuple::makeTree() {
         tree->Branch("genPart_vz", &(*genPart_vz));
     }
 
+    if (useRECOMuons_){
+      tree->Branch("recoMuon_pt", &(*recoMuon_pt));
+      tree->Branch("recoMuon_eta", &(*recoMuon_eta));
+      tree->Branch("recoMuon_eta_st1", &(*recoMuon_eta_st1));
+      tree->Branch("recoMuon_eta_st2", &(*recoMuon_eta_st2));
+      tree->Branch("recoMuon_phi", &(*recoMuon_phi));
+      tree->Branch("recoMuon_phi_st1", &(*recoMuon_phi_st1));
+      tree->Branch("recoMuon_phi_st2", &(*recoMuon_phi_st2));
+      tree->Branch("recoMuon_theta", &(*recoMuon_theta));
+      tree->Branch("recoMuon_theta_st1", &(*recoMuon_theta_st1));
+      tree->Branch("recoMuon_theta_st2", &(*recoMuon_theta_st2));
+      tree->Branch("recoMuon_samPt", &(*recoMuon_samPt));
+      tree->Branch("recoMuon_q", &(*recoMuon_q));
+      tree->Branch("recoMuon_matchedStations", &(*recoMuon_matchedStations));
+      tree->Branch("recoMuon_chi2Norm", &(*recoMuon_chi2Norm));
+      tree->Branch("recoMuon_iso", &(*recoMuon_iso));
+      tree->Branch("recoMuon_isLoose", &(*recoMuon_isLoose));
+      tree->Branch("recoMuon_isMedium", &(*recoMuon_isMedium));
+      tree->Branch("recoMuon_isTight", &(*recoMuon_isTight));
+      tree->Branch("recoMuon_size", &(*recoMuon_size));
+      tree->Branch("recoMuon_dxy_bs", &(*recoMuon_dxy_bs));
+      tree->Branch("recoMuon_dz_bs", &(*recoMuon_dz_bs));
+      tree->Branch("recoMuon_dxy_pv", &(*recoMuon_dxy_pv));
+      tree->Branch("recoMuon_dz_pv", &(*recoMuon_dz_pv));
+      tree->Branch("recoMuon_hlt_ID", &(*recoMuon_hlt_ID));
+      tree->Branch("recoMuon_hlt_dR", &(*recoMuon_hlt_dR));
+    }
+
     // Event info
     if (useEventInfo_) {
         tree->Branch("eventInfo_event", &(*eventInfo_event));
@@ -2183,6 +2485,33 @@ void EMTFNtuple::fillTree() {
     genPart_vx->clear();
     genPart_vy->clear();
     genPart_vz->clear();
+
+    recoMuon_pt->clear();
+    recoMuon_eta->clear();
+    recoMuon_eta_st1->clear();
+    recoMuon_eta_st2->clear();
+    recoMuon_phi->clear();
+    recoMuon_phi_st1->clear();
+    recoMuon_phi_st2->clear();
+    recoMuon_theta->clear();
+    recoMuon_theta_st1->clear();
+    recoMuon_theta_st2->clear();
+    recoMuon_samPt->clear();
+    recoMuon_q->clear();
+    recoMuon_matchedStations->clear();
+    recoMuon_chi2Norm->clear();
+    recoMuon_iso->clear();
+    recoMuon_isLoose->clear();
+    recoMuon_isMedium->clear();
+    recoMuon_isTight->clear();
+    recoMuon_dxy_bs->clear();
+    recoMuon_dz_bs->clear();
+    recoMuon_dxy_pv->clear();
+    recoMuon_dz_pv->clear();
+    recoMuon_hlt_dR->clear();
+    recoMuon_hlt_ID->clear();
+    (*recoMuon_size) = 0;
+
 
     // Event info
     eventInfo_event->clear();

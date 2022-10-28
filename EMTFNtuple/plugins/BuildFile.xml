@@ -3,6 +3,10 @@
 <use name="FWCore/PluginManager"/>
 <use name="CommonTools/UtilAlgos"/>
 <use name="DataFormats/HepMCCandidate"/>
+<use name="DataFormats/VertexReco"/>
+<use name="DataFormats/MuonReco"/>
 <use name="L1Trigger/L1TMuon"/>
 <use name="L1Trigger/L1TMuonEndCap"/>
+<use name="HLTrigger/HLTcore"/>  <!-- For HLT muon matching -->
+<use name="MuonAnalysis/MuonAssociators"/>  <!-- For the RECO muon extrapolation -->
 <flags EDM_PLUGIN="1"/>
