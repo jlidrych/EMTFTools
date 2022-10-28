@@ -42,7 +42,7 @@ int DefaultColor(int j,int i){
 }
 
 
-int makeTriggerRatePlots(int gmtMuonMode){
+int makeTriggerRatePlotsUnp(int gmtMuonMode){
 
   //read data
   //  TString ntuple = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/RelValMinBias_14TeV/MC-MB/220215_195151/0000/EMTFNtuple_*.root";
@@ -56,7 +56,7 @@ int makeTriggerRatePlots(int gmtMuonMode){
   //  TString ntuple = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/SingleNeutrino_Pt-2To20-gun/MC-SingleNeutrino/220224_164155/0000/EMTFNtuple_*.root";
   //TString ntuple1 = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/SingleNeutrino_Pt-2To20-gun/MC-SingleNeutrino/220224_164155/0001/EMTFNtuple_*.root";
   //  TString ntuple = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/SingleNeutrino_Pt-2To20-gun/MC-SingleNeutrino/220518_122348/0000/EMTFNtuple_*.root";
-  // TString ntuple1 = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/SingleNeutrino_Pt-2To20-gun/MC-SingleNeutrino/220518_122348/0001/EMTFNtuple_*.root";
+  //TString ntuple1 = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/SingleNeutrino_Pt-2To20-gun/MC-SingleNeutrino/220518_122348/0001/EMTFNtuple_*.root";
   TString ntuple = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/SingleNeutrino_E-10-gun/MC-SingleNeutrino/220530_122133/0000/EMTFNtuple_*.root";
   TString ntuple1 = "/pnfs/desy.de/cms/tier2/store/user/jlidrych/SingleNeutrino_E-10-gun/MC-SingleNeutrino/220530_122133/0001/EMTFNtuple_*.root";
   TChain * cc=new TChain("EMTFNtuple/tree");
@@ -67,23 +67,14 @@ int makeTriggerRatePlots(int gmtMuonMode){
   TTreeReader readerGetEntries(cc);
   TTreeReader reader(cc);
 
-    
-  TTreeReaderValue<int32_t> gmtMuonSize(reader,"gmtMuon_size");
-  TTreeReaderArray<float  > gmtMuonPt(reader,"gmtMuon_pt");
-  TTreeReaderArray<float  > gmtMuonPtDxy(reader,"gmtMuon_pt_dxy");
-  TTreeReaderArray<float  > gmtMuonPhi(reader,"gmtMuon_phi");
-  TTreeReaderArray<float  > gmtMuonEta(reader,"gmtMuon_eta");
-  TTreeReaderArray<short  > gmtMuonQual(reader,"gmtMuon_qual");
-  
-
-  /*    
+ 
   TTreeReaderValue<int32_t> gmtMuonSize(reader,"gmtUnpMuon_size");
   TTreeReaderArray<float  > gmtMuonPt(reader,"gmtUnpMuon_pt");
   TTreeReaderArray<float  > gmtMuonPtDxy(reader,"gmtUnpMuon_pt_dxy");
   TTreeReaderArray<float  > gmtMuonPhi(reader,"gmtUnpMuon_phi");
   TTreeReaderArray<float  > gmtMuonEta(reader,"gmtUnpMuon_eta");
   TTreeReaderArray<short  > gmtMuonQual(reader,"gmtUnpMuon_qual");
-  */
+ 
 
 
   gStyle->SetOptStat(0);
@@ -100,7 +91,7 @@ int makeTriggerRatePlots(int gmtMuonMode){
   // cosmetic options
   std::vector<bool> grid,logY,logX;
 
-  TString outputfileName = "outputfile-rate.root";
+  TString outputfileName = "outputfile-rate-unp.root";
 
   // initialize cuts
 
