@@ -32,3 +32,23 @@ or
 ```bash
 crab submit -c crabDY.py
 ```
+
+## Plotting
+Plotting scripts are available in ``` Macros``` directory.
+### Rate plots
+Re-emulated:
+
+```root -b -q makeTriggerRatePlots.C\(argument\)``` - argument is integer - gmtMuonMode=3,7,11 for open, double, tight quality
+
+Unpacked: 
+
+```root -b -q makeTriggerRatePlotsUnp.C\(argument\)``` - argument is integer - gmtMuonMode=3,7,11 for open, double, tight quality
+
+### Trigger efficiency
+One need to make skimmed ntuples.
+
+``` root -b -q makeMatchedNtuplesFromCRAB.C ``` or ```root -b -q makeMatchedNtuplesFromCRABUnp.C ```
+
+and now calculate trigger efficiency:
+
+``` root -b -q makeTriggerEfficiencyPlots.C ``` .
